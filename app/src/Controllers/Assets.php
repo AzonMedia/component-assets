@@ -46,7 +46,8 @@ class Assets extends BaseController
             $struct = ['files' => [] ];
             foreach ($files as $ContainedFile) {
                 $struct['files'][] = [
-                    'name'      => $ContainedFile->get_relative_path(),
+                    //'name'      => $ContainedFile->get_relative_path(),
+                    'name'      => $ContainedFile->get_name(),
                     'is_dir'    => $ContainedFile->is_dir(),
                     'mime_type' => $ContainedFile->is_dir() ? '' : $ContainedFile->get_mime_type(),
                 ];

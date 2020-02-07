@@ -57,6 +57,10 @@ class File extends Base
         $this->absolute_path = $real_absolute_path;
     }
 
+    public function __toString() : string
+    {
+        return $this->get_name();
+    }
 
     /**
      * Returns a file based on the provided path.
@@ -175,6 +179,17 @@ class File extends Base
         return $this->absolute_path;
     }
 
+
+    public function get_name() : string
+    {
+        return basename($this->relative_path);
+    }
+
+    public function get_dir() : string
+    {
+        return dirname($this->relative_path);
+    }
+
     public function is_dir() : bool
     {
         return is_dir($this->absolute_path);
@@ -216,7 +231,7 @@ class File extends Base
             if (is_link($this->absolute_path.'/'.$path)) {
                 continue;
             }
-            $ret[] = new self($this->relative_path.$path);
+            $ret[] = new self($this->relative_path.'/'.$path);
         }
         return $ret;
         //return array_map( fn(string $path) : self => new self($path) , scandir($this->absolute_path) );
