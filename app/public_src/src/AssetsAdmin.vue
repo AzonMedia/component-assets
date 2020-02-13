@@ -83,7 +83,6 @@
                 if (typeof this.$route.params.pathMatch !== "undefined") {
                     path = this.$route.params.pathMatch
                 }
-                console.log("BBBBBBBBBBBB")
                 this.get_dir_files(path)
             }
         },
