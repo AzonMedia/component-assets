@@ -1,5 +1,5 @@
 <template>
-    <div class="assets-file" v-on:dblclick="$parent.file_click_handler(FileData)">
+    <div class="file" v-bind:class="{highlighted: FileData.is_highlighted}" v-on:click="$parent.file_click_handler(FileData)" v-on:dblclick="$parent.file_dblclick_handler(FileData)">
         <!-- <img :alt="file_data.name" src="@GuzabaPlatform.Assets/assets/file.png"> -->
         <img :alt="FileData.name" :src="require(`@GuzabaPlatform.Assets/assets/${get_icon_src(FileData)}`)">
         <!-- <img :alt="file_data.name" :src="get_icon_src(file_data)"> -->
@@ -43,8 +43,13 @@
 </script>
 
 <style scoped>
-.assets-file
+.file
 {
     float: left;
+    cursor: pointer;
+}
+.highlighted
+{
+    background-color: deepskyblue;
 }
 </style>

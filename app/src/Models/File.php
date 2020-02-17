@@ -9,6 +9,8 @@ use Guzaba2\Authorization\Exceptions\PermissionDeniedException;
 use Guzaba2\Base\Base;
 use Guzaba2\Base\Exceptions\InvalidArgumentException;
 use Guzaba2\Base\Exceptions\RunTimeException;
+use Guzaba2\Base\Interfaces\BaseInterface;
+use Guzaba2\Base\Traits\BaseTrait;
 use Guzaba2\Orm\Exceptions\RecordNotFoundException;
 use Guzaba2\Orm\Store\Interfaces\StoreInterface;
 use GuzabaPlatform\Platform\Application\BaseActiveRecord;
@@ -20,18 +22,29 @@ use Guzaba2\Translator\Translator as t;
  *
  * This class represents a File under the store_
  */
-class File extends \Azonmedia\Filesystem\File
+class File extends \Azonmedia\Filesystem\File implements BaseInterface
 {
 
     protected const CONFIG_DEFAULTS = [
         'services'          =>  [
             'GuzabaPlatform',
         ],
-        'store_relative_base'    => '/public/assets/',// this is relative to the application diretory -> ./app/public/assets
+        'store_relative_base'    => '/public/assets',// this is relative to the application diretory -> ./app/public/assets
     ];
 
     protected const CONFIG_RUNTIME = [];
 
+    use BaseTrait;
+
+    public static function _initialize_class() : void
+    {
+        if (!isset(self::CONFIG_RUNTIME['store_relative_base'])) {
+            throw new RunTimeException();
+        }
+        if (self::CONFIG_RUNTIME['store_relative_base'][-1] === '/') {
+            throw new RunTimeException(sprintf(t::_('The store_relative_base configuration option has a trailing /.')));
+        }
+    }
 
     public static function set_absolute_store_path(string $absolute_path) : void
     {
@@ -67,6 +80,5 @@ class File extends \Azonmedia\Filesystem\File
         }
         return $real_store_base_path;
     }
-
 
 }

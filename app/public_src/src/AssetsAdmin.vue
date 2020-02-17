@@ -3,17 +3,24 @@
         <div>Path: {{current_dir_display_path}}</div>
         <div>
             <ButtonC v-bind:ButtonData="Buttons.ParentDirButton"></ButtonC>
-            <ButtonC v-bind:ButtonData="Buttons.CreateDirButton"></ButtonC>
-            <ButtonC v-bind:ButtonData="Buttons.UploadFileButton"></ButtonC>
+            <ButtonC v-bind:ButtonData="Buttons.CreateDirButton" v-b-modal.create-directory-modal></ButtonC>
+            <ButtonC v-bind:ButtonData="Buttons.UploadFileButton" v-b-modal.upload-file-modal></ButtonC>
             <ButtonC v-bind:ButtonData="Buttons.CopyButton"></ButtonC>
             <ButtonC v-bind:ButtonData="Buttons.RenameButton"></ButtonC>
-            <ButtonC v-bind:ButtonData="Buttons.DeleteButton"></ButtonC>
+            <ButtonC v-bind:ButtonData="Buttons.DeleteButton" v-b-modal.delete-file-modal></ButtonC>
             <ButtonC v-bind:ButtonData="Buttons.PropertiesButton"></ButtonC>
+            <ButtonC v-bind:ButtonData="Buttons.AddToNavigationButton"></ButtonC>
         </div>
         <div style="clear:both"></div>
         <div>
             <FileC v-for="(FileData, index) in Files" v-bind:FileData="FileData"/>
         </div>
+
+        <!-- modals -->
+        <CreateDirC v-bind:ModalData="ModalData"></CreateDirC>
+        <UploadFileC v-bind:ModalData="ModalData"></UploadFileC>
+        <DeleteC v-bind:ModalData="ModalData"></DeleteC>
+
     </div>
 </template>
 
@@ -21,6 +28,11 @@
 
     import FileC from '@GuzabaPlatform.Assets/components/File.vue'
     import ButtonC from '@GuzabaPlatform.Platform/components/Button.vue'
+
+    import DeleteC from '@GuzabaPlatform.Assets/components/Delete.vue'
+    import CreateDirC from '@GuzabaPlatform.Assets/components/CreateDir.vue'
+    import UploadFileC from '@GuzabaPlatform.Assets/components/UploadFile.vue'
+
     import AliasesMixin from '@GuzabaPlatform.Platform/aliasesMixin.js'
 
     export default {
@@ -29,57 +41,95 @@
         components: {
             FileC,
             ButtonC,
+
+            CreateDirC,
+            UploadFileC,
+            DeleteC,
+
         },
 
         data() {
             return {
-                current_dir_path : '',
+                //buttons components data
+                // CreateDirData: {},
+                // DeleteData: {},
+                // UploadFileData: {},
+                // CopyData: {},
+                // RenameData: {},
+                // DeleteData: {},
+                // PropertiesData: {},
+                // AddToNavigationData: {},
+                HighlightedFile: {
+                    name: '',
+                },
+                //current_dir_path : '',
+                CurrentDirPath: {
+                    name: '',
+                },
+                ModalData: {
+                    //highlighted_file: this.highlighted_file,
+                    //HighlightedFile: this.HighlightedFile,//it is not possible to assign it here to property of this
+                    //it is done in mounted()
+                    HighlightedFile: {},
+                    CurrentDirPath: {},
+                },
+
+
                 //current_dir_path : this.base_dir_path,
                 //base_dir_path : '[/public/assets] /',
                 //base_dir_path : '/',
                 current_dir_display_path : '',
                 base_dir_display_path : '[/public/assets] /',
+                //highlighted_file: '',
+
                 Files : {},
                 Buttons: {
                     ParentDirButton: {
                         label: 'Parent Dir',
                         is_active: true,
-                        handler: this.create_dir_handler,
+                        handler: this.parent_dir_handler,
                     },
                     CreateDirButton: {
                         label: 'Create Dir',
                         is_active: true,
+                        handler: this.create_dir_handler,
                     },
                     UploadFileButton: {
                         label: 'Upload File',
                         is_active: true,
+                        handler: this.upload_file_handler,
                     },
                     CopyButton: {
                         label: 'Copy',
                         is_active: true,
+                        handler: this.copy_handler,
                     },
                     RenameButton: {
                         label: 'Rename/Move',
                         is_active: true,
+                        handler: this.rename_handler,
                     },
                     DeleteButton: {
                         label: 'Delete',
                         is_active: true,
+                        handler: this.delete_handler,
                     },
                     PropertiesButton: {
                         label: 'Properties',
                         is_active: true,
+                        handler: this.properties_handler,
+                    },
+                    AddToNavigationButton: {
+                        label: 'Add to Navigation',
+                        is_active: true,
+                        handler: this.add_to_navigation_handler,
                     },
                 },
             }
         },
         watch: {
             $route (to, from) { // needed because by default no class is loaded and when it is loaded the component for the two routes is the same.
-                // this.selectedClassName = this.$route.params.class.split('-').join('\\');
-                // //console.log("ASD " + this.selectedClassName)
-                // this.getClassObjects(this.selectedClassName);
-                //console.log(this.$route.params);
-                let path = this.current_dir_path;
+                let path = '';
                 if (typeof this.$route.params.pathMatch !== "undefined") {
                     path = this.$route.params.pathMatch
                 }
@@ -88,13 +138,29 @@
         },
         methods: {
             get_dir_files(path) {
-                //console.log("ASD")
-                this.current_dir_path = path;
-                this.current_dir_display_path = this.base_dir_display_path + this.current_dir_path;
+                //this.highlighted_file = '';//clear the currently highglighted file when dir is changed
+                this.HighlightedFile.name = '';
+                //this.current_dir_path = path;
+                this.CurrentDirPath.name = path;
+                //this.current_dir_display_path = this.base_dir_display_path + this.current_dir_path;
+                this.current_dir_display_path = this.base_dir_display_path + this.CurrentDirPath.name;
                 let self = this;
                 this.$http.get('/admin/assets/' + path )
                     .then(resp => {
-                        self.Files = Object.values(resp.data.files);
+                        if (typeof resp.data.files !== "undefined") {
+                            //this will not work - assigning and then setting the property
+                            //the property first needs to be set on all records and then assigned to Files as otherwise the File.vue template will fail
+                            //self.Files = Object.values(resp.data.files);
+                            //this.unhighlight_all_files();
+                            let Files = Object.values(resp.data.files);
+                            for (const el in Files) {
+                                Files[el].is_highlighted = 0;
+                            }
+                            self.Files = Files;
+                        } else {
+                            console.log('No Files data received');
+                        }
+
                     })
                     .catch(err => {
                         console.log(err);
@@ -105,32 +171,84 @@
                         //self.$bvModal.show('class-permissions');
                     });
             },
-            file_click_handler(FileData) {
+            //opens the file
+            file_dblclick_handler(FileData) {
                 if (FileData.is_dir) {
-                    let path = this.current_dir_path + FileData.name;
+                    //let path = this.current_dir_path + FileData.name;
+                    let path = this.CurrentDirPath.name + FileData.name;
                     path = path.split('./').join('');
                     this.$router.push('/admin/assets/' + path)
-                    //this.$router.push('/assets/' + ;
                 } else {
 
                 }
             },
+            //highlights the file
+            file_click_handler(FileData) {
+                this.highlight_file(FileData);
+            },
+            parent_dir_handler() {
+                //let path_arr = this.current_dir_path.split('/');
+                let path_arr = this.CurrentDirPath.name.split('/');
+                path_arr.pop();
+                let path = path_arr.join('/');
+                this.$router.push('/admin/assets/' + path)
+            },
             create_dir_handler() {
 
             },
+            upload_file_handler() {
+
+            },
+            copy_handler() {
+
+            },
+            rename_handler() {
+
+            },
+            delete_handler() {
+
+            },
+            properties_handler() {
+
+            },
+            add_to_navigation_handler() {
+
+            },
+            highlight_file(FileData) {
+                //clear any previously highlighted file first
+                this.unhighlight_all_files();
+                //if (this.highlighted_file === FileData.name) {
+                if (this.HighlightedFile.name === FileData.name) {
+                    //if it is already highglighted unhighlight it
+                    //this.highlighted_file = '';
+                    this.HighlightedFile.name = '';
+                    return;
+                }
+                //this.highlighted_file = FileData.name;
+                this.HighlightedFile.name = FileData.name;
+                //this.ModalData.highlighted_file = this.highlighted_file;
+                for (const el in this.Files) {
+                    if (this.Files[el].name === FileData.name) {
+                        this.Files[el].is_highlighted = 1;
+                    }
+                }
+                console.log(this.Files);
+            },
+            unhighlight_all_files() {
+                for (const el in this.Files) {
+                    this.Files[el].is_highlighted = 0;
+                }
+            }
+
         },
         mounted() {
-            //this.get_dir_files(this.current_dir_path);
-            console.log(this.current_dir_path);
-            let path = this.current_dir_path;
-            //console.log(typeof this.$route.params.pathMatch);
-            //console.log(path);
+            this.ModalData.HighlightedFile = this.HighlightedFile;
+            this.ModalData.CurrentDirPath = this.CurrentDirPath;
+            //let path = this.current_dir_path;
+            let path = this.CurrentDirPath.name;
             if (typeof this.$route.params.pathMatch !== "undefined") {
-                console.log("VVVVVVVVVV")
                 path = this.$route.params.pathMatch
             }
-            //console.log(path);
-            //console.log("AAAAAAAAAAAAAA")
             this.get_dir_files(path);
         }
     }

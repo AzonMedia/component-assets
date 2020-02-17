@@ -10,6 +10,7 @@ use Guzaba2\Orm\Exceptions\RecordNotFoundException;
 use GuzabaPlatform\Assets\Models\File;
 use GuzabaPlatform\Platform\Application\BaseController;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UploadedFileInterface;
 
 class Assets extends BaseController
 {
@@ -17,11 +18,24 @@ class Assets extends BaseController
     protected const CONFIG_DEFAULTS = [
         'routes'        => [
             '/admin/assets' => [
-                Method::HTTP_GET => [self::class, 'main']
+                Method::HTTP_GET => [self::class, 'main'],
+                Method::HTTP_POST => [self::class, 'create_file'],
+                //it is not allowed to delete, copy or renamte the root directory
             ],
             '/admin/assets/{path}' => [
-                Method::HTTP_GET => [self::class, 'main']
+                Method::HTTP_GET => [self::class, 'main'],
+                Method::HTTP_POST => [self::class, 'create_file'],
+                Method::HTTP_DELETE => [self::class, 'delete_file'],
+                Method::HTTP_PATCH => [self::class, 'rename_file'],
+                Method::HTTP_PUT => [self::class, 'copy_file'],
             ],
+
+            '/admin/assets/properties/{path}' => [
+                Method::HTTP_GET => [self::class, 'properties']
+            ],
+            //'/admin/assets/add-to-navigation/{path}' => [
+            //    Method::HTTP_POST => [self::class, 'add_to_navigation']
+            //],
         ],
         //'directory_separator'   => '+',//this is used instead of / as this can not be used in the URL / REST endpoints
     ];
@@ -57,19 +71,26 @@ class Assets extends BaseController
         return $Response;
     }
 
-    public function create_dir(string $path) : ResponseInterface
+    /**
+     * @param string $path
+     * @param UploadedFileInterface|null $uploaded_file
+     * @param string $dir
+     * @return ResponseInterface
+     * @throws \Azonmedia\Exceptions\InvalidArgumentException
+     */
+    public function create_file(string $path = './', ?UploadedFileInterface $uploaded_file = NULL, string $dir = '') : ResponseInterface
     {
+        if ($uploaded_file) {
+            $File = File::upload_file($path, $uploaded_file);
+            $struct = ['message' => 'OK'];
+            $Response = self::get_structured_ok_response($struct);
+        } elseif ($dir) {
 
-    }
+        } else {
+            return self::get_structured_badrequest_response(['message' => t::_('No file uploaded or directory name provided.') ]);
+        }
 
-    public function upload_file() : ResponseInterface
-    {
-
-    }
-
-    public function view_file(string $path) : ResponseInterface
-    {
-
+        return $Response;
     }
 
     public function delete_file(string $path) : ResponseInterface
@@ -86,4 +107,15 @@ class Assets extends BaseController
     {
 
     }
+
+    public function properties(string $path) : ResponseInterface
+    {
+
+    }
+
+//this needs to be defined as a hook
+//    public function add_to_navigation(string $path) : ResponseInterface
+//    {
+//
+//    }
 }
