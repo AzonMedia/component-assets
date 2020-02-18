@@ -172,11 +172,13 @@
                             self.Files = Files;
                         } else {
                             console.log('No Files data received');
+                            self.show_toast('No Files data was received.');
                         }
 
                     })
                     .catch(err => {
                         console.log(err);
+                        self.show_toast(err.response.data.message);
                         self.Files = [];
                         //self.requestError = err;
                         //self.items_permissions = [];
