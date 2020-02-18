@@ -17,6 +17,9 @@
             <div v-if="!Files.length">
                 There are no files or directories.
             </div>
+            <div v-if="error_message" class="error-message">
+                {{ error_message }}
+            </div>
         </div>
 
         <div id="preview">
@@ -63,15 +66,7 @@
 
         data() {
             return {
-                //buttons components data
-                // CreateDirData: {},
-                // DeleteData: {},
-                // UploadFileData: {},
-                // CopyData: {},
-                // RenameData: {},
-                // DeleteData: {},
-                // PropertiesData: {},
-                // AddToNavigationData: {},
+                error_message: '',
                 HighlightedFile: {
                     name: '',
                 },
@@ -171,14 +166,16 @@
                             }
                             self.Files = Files;
                         } else {
-                            console.log('No Files data received');
-                            self.show_toast('No Files data was received.');
+                            //console.log('No Files data received');
+                            //self.show_toast('No Files data was received.');
+                            this.error_message = 'No Files data was received.';
                         }
 
                     })
                     .catch(err => {
-                        console.log(err);
-                        self.show_toast(err.response.data.message);
+                        //console.log(err);
+                        //self.show_toast(err.response.data.message);
+                        this.error_message = err.response.data.message;
                         self.Files = [];
                         //self.requestError = err;
                         //self.items_permissions = [];
@@ -278,5 +275,7 @@
 </script>
 
 <style scoped>
-
+.error-message {
+    border: 2px solid red;
+}
 </style>
