@@ -81,4 +81,25 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface
         return $real_store_base_path;
     }
 
+    public function get_ctime_string() : string
+    {
+        $GuzabaPlatform = self::get_service('GuzabaPlatform');
+        $date_time_format = $GuzabaPlatform->get_date_time_formats()['date_time_format'];
+        return date($date_time_format, $this->get_ctime());
+    }
+
+    public function get_mtime_string() : string
+    {
+        $GuzabaPlatform = self::get_service('GuzabaPlatform');
+        $date_time_format = $GuzabaPlatform->get_date_time_formats()['date_time_format'];
+        return date($date_time_format, $this->get_mtime());
+    }
+
+    public function get_atime_string() : string
+    {
+        $GuzabaPlatform = self::get_service('GuzabaPlatform');
+        $date_time_format = $GuzabaPlatform->get_date_time_formats()['date_time_format'];
+        return date($date_time_format, $this->get_atime());
+    }
+
 }

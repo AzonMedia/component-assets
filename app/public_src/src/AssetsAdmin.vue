@@ -5,21 +5,29 @@
             <ButtonC v-bind:ButtonData="Buttons.ParentDirButton"></ButtonC>
             <ButtonC v-bind:ButtonData="Buttons.CreateDirButton" v-b-modal.create-directory-modal></ButtonC>
             <ButtonC v-bind:ButtonData="Buttons.UploadFileButton" v-b-modal.upload-file-modal></ButtonC>
-            <ButtonC v-bind:ButtonData="Buttons.CopyButton"></ButtonC>
-            <ButtonC v-bind:ButtonData="Buttons.RenameButton"></ButtonC>
+            <!-- <ButtonC v-bind:ButtonData="Buttons.CopyButton"></ButtonC> -->
+            <!-- <ButtonC v-bind:ButtonData="Buttons.RenameButton"></ButtonC> -->
             <ButtonC v-bind:ButtonData="Buttons.DeleteButton" v-b-modal.delete-file-modal></ButtonC>
-            <ButtonC v-bind:ButtonData="Buttons.PropertiesButton"></ButtonC>
-            <ButtonC v-bind:ButtonData="Buttons.AddToNavigationButton"></ButtonC>
+            <ButtonC v-bind:ButtonData="Buttons.PropertiesButton" v-b-modal.properties-modal></ButtonC>
+            <!-- <ButtonC v-bind:ButtonData="Buttons.AddToNavigationButton"></ButtonC> -->
         </div>
         <div style="clear:both"></div>
         <div>
             <FileC v-for="(FileData, index) in Files" v-bind:FileData="FileData"/>
+            <div v-if="!Files.length">
+                There are no files or directories.
+            </div>
+        </div>
+
+        <div id="preview">
+
         </div>
 
         <!-- modals -->
         <CreateDirC v-bind:ModalData="ModalData"></CreateDirC>
         <UploadFileC v-bind:ModalData="ModalData"></UploadFileC>
         <DeleteC v-bind:ModalData="ModalData"></DeleteC>
+        <PropertiesC v-bind:ModalData="ModalData"></PropertiesC>
 
     </div>
 </template>
@@ -32,12 +40,17 @@
     import DeleteC from '@GuzabaPlatform.Assets/components/Delete.vue'
     import CreateDirC from '@GuzabaPlatform.Assets/components/CreateDir.vue'
     import UploadFileC from '@GuzabaPlatform.Assets/components/UploadFile.vue'
+    import PropertiesC from '@GuzabaPlatform.Assets/components/Properties.vue'
 
     import AliasesMixin from '@GuzabaPlatform.Platform/aliasesMixin.js'
+    import ToastMixin from '@GuzabaPlatform.Platform/ToastMixin.js'
 
     export default {
         name: "AssetsAdmin",
-        mixins: [AliasesMixin],
+        mixins: [
+            AliasesMixin,
+            ToastMixin,
+        ],
         components: {
             FileC,
             ButtonC,
@@ -45,7 +58,7 @@
             CreateDirC,
             UploadFileC,
             DeleteC,
-
+            PropertiesC,
         },
 
         data() {
@@ -92,32 +105,32 @@
                     CreateDirButton: {
                         label: 'Create Dir',
                         is_active: true,
-                        handler: this.create_dir_handler,
+                        handler: this.blank_button_handler,
                     },
                     UploadFileButton: {
                         label: 'Upload File',
                         is_active: true,
-                        handler: this.upload_file_handler,
+                        handler: this.blank_button_handler,
                     },
                     CopyButton: {
                         label: 'Copy',
                         is_active: true,
-                        handler: this.copy_handler,
+                        handler: this.blank_button_handler,
                     },
                     RenameButton: {
                         label: 'Rename/Move',
                         is_active: true,
-                        handler: this.rename_handler,
+                        handler: this.blank_button_handler,
                     },
                     DeleteButton: {
                         label: 'Delete',
                         is_active: true,
-                        handler: this.delete_handler,
+                        handler: this.blank_button_handler,
                     },
                     PropertiesButton: {
                         label: 'Properties',
                         is_active: true,
-                        handler: this.properties_handler,
+                        handler: this.blank_button_handler,
                     },
                     AddToNavigationButton: {
                         label: 'Add to Navigation',
@@ -175,7 +188,11 @@
             file_dblclick_handler(FileData) {
                 if (FileData.is_dir) {
                     //let path = this.current_dir_path + FileData.name;
-                    let path = this.CurrentDirPath.name + FileData.name;
+                    let path = this.CurrentDirPath.name
+                    if (path) {
+                        path += '/';
+                    }
+                     path += FileData.name;
                     path = path.split('./').join('');
                     this.$router.push('/admin/assets/' + path)
                 } else {
@@ -193,27 +210,31 @@
                 let path = path_arr.join('/');
                 this.$router.push('/admin/assets/' + path)
             },
-            create_dir_handler() {
-
+            blank_button_handler() {
+                //just an empty handler for the button component on click event
+                //some dont use these handlers but the modal one
             },
-            upload_file_handler() {
-
-            },
-            copy_handler() {
-
-            },
-            rename_handler() {
-
-            },
-            delete_handler() {
-
-            },
-            properties_handler() {
-
-            },
-            add_to_navigation_handler() {
-
-            },
+            // create_dir_handler() {
+            //
+            // },
+            // upload_file_handler() {
+            //
+            // },
+            // copy_handler() {
+            //
+            // },
+            // rename_handler() {
+            //
+            // },
+            // delete_handler() {
+            //
+            // },
+            // properties_handler() {
+            //
+            // },
+            // add_to_navigation_handler() {
+            //
+            // },
             highlight_file(FileData) {
                 //clear any previously highlighted file first
                 this.unhighlight_all_files();
