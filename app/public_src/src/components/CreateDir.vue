@@ -1,7 +1,7 @@
 <template>
-    <b-modal title="Create Directory" id="create-directory-modal" @ok="ModalOkHandler" @cancel="ModalCancelHandler" @show="ModalShowHandler">
+    <b-modal title="Create Directory" id="create-directory-modal" @ok="modal_ok_handler" @cancel="modal_cancel_handler" @show="modal_show_handler">
         <div>
-            <p>Create directory: /{{ModalData.CurrentDirPath.name}}/ <input v-model="new_directory_name" placeholder="new dir name" /></p>
+            <p>Create directory: /{{ModalData.CurrentDirPath.name}}/ <input v-model="new_directory_name" type="text" placeholder="new dir name" /></p>
         </div>
     </b-modal>
 </template>
@@ -18,7 +18,7 @@
             };
         },
         methods: {
-            ModalOkHandler(bvModalEvent) {
+            modal_ok_handler(bvModalEvent) {
                 let url = '/admin/assets/' + this.ModalData.CurrentDirPath.name;
                 let self = this;
                 //form data submits forms not plain JSON
@@ -36,10 +36,10 @@
                         self.$parent.get_dir_files(self.ModalData.CurrentDirPath.name);
                     });
             },
-            ModalCancelHandler(bvModalEvent) {
+            modal_cancel_handler(bvModalEvent) {
                 this.new_directory_name = '';
             },
-            ModalShowHandler(bvModalEvent) {
+            modal_show_handler(bvModalEvent) {
                 this.new_directory_name = '';
             }
         }
