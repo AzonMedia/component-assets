@@ -5,9 +5,12 @@ namespace GuzabaPlatform\Assets;
 
 use Guzaba2\Event\Event;
 use Guzaba2\Http\RewritingMiddleware;
+use Guzaba2\Mvc\Controller;
+use GuzabaPlatform\Assets\Hooks\AfterStaticContentMain;
 use GuzabaPlatform\Components\Base\BaseComponent;
 use GuzabaPlatform\Components\Base\Interfaces\ComponentInitializationInterface;
 use GuzabaPlatform\Components\Base\Interfaces\ComponentInterface;
+use GuzabaPlatform\Navigation\Controllers\StaticContent;
 use GuzabaPlatform\Platform\Application\Middlewares;
 use GuzabaPlatform\Platform\Application\UrlRewritingRules;
 
@@ -44,8 +47,9 @@ class Component extends BaseComponent implements ComponentInterface, ComponentIn
     {
         //self::update_rewriting_rules();
         self::register_routes();
+        self::register_navigation_hook();
         //return ['register_routes','update_rewriting_rules'];
-        return ['register_routes'];
+        return ['register_routes','register_navigation_hook'];
     }
 
 //this will be needed only for the private assets
@@ -67,6 +71,14 @@ class Component extends BaseComponent implements ComponentInterface, ComponentIn
 //        $Events = self::get_service('Events');
 //        $Events->add_class_callback(Middlewares::class, '_after_setup', $MiddlwareCallback);
 //    }
+
+    public static function register_navigation_hook() : void
+    {
+        //Controller::register_after_hook(Auth::class, '_after_main', AfterLoginMain::class, 'execute_hook');
+        if (class_exists(StaticContent::class)) {
+            Controller::register_after_hook(StaticContent::class, '_after_main', [new AfterStaticContentMain(), 'execute_hook']);
+        }
+    }
 
     /**
      * @throws \Guzaba2\Base\Exceptions\RunTimeException
