@@ -8,7 +8,7 @@ use Guzaba2\Http\Body\Structured;
 use GuzabaPlatform\Assets\Models\File;
 use Psr\Http\Message\ResponseInterface;
 
-class AfterStaticContentMain extends Base
+class AfterFrontendRoutesMain extends Base
 {
     public function execute_hook(ResponseInterface $Response) : ResponseInterface
     {
@@ -21,12 +21,13 @@ class AfterStaticContentMain extends Base
         $assets = array_map(fn($path) => '/'.$path, $assets);
 
         //$struct['content']['assets'] = $assets;//this will append the assets... but we need to prepend it
-        $old_content = $struct['content'];
-        $new_content = ['assets' => $assets];
-        foreach ($old_content as $key => $value) {
-            $new_content[$key] = $value;
-        }
-        $struct['content'] = $new_content;
+//        $old_content = $struct['content'];
+//        $new_content = ['assets' => $assets];
+//        foreach ($old_content as $key => $value) {
+//            $new_content[$key] = $value;
+//        }
+//        $struct['content'] = $new_content;
+        $struct['assets'] = $assets;
 
         $Response = $Response->withBody( new Structured($struct) );
         return $Response;

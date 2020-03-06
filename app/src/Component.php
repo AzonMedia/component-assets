@@ -6,11 +6,12 @@ namespace GuzabaPlatform\Assets;
 use Guzaba2\Event\Event;
 use Guzaba2\Http\RewritingMiddleware;
 use Guzaba2\Mvc\Controller;
+use GuzabaPlatform\Assets\Hooks\AfterFrontendRoutesMain;
 use GuzabaPlatform\Assets\Hooks\AfterStaticContentMain;
 use GuzabaPlatform\Components\Base\BaseComponent;
 use GuzabaPlatform\Components\Base\Interfaces\ComponentInitializationInterface;
 use GuzabaPlatform\Components\Base\Interfaces\ComponentInterface;
-use GuzabaPlatform\Navigation\Controllers\StaticContent;
+use GuzabaPlatform\Navigation\Controllers\FrontendRoutes;
 use GuzabaPlatform\Platform\Application\Middlewares;
 use GuzabaPlatform\Platform\Application\UrlRewritingRules;
 
@@ -75,8 +76,8 @@ class Component extends BaseComponent implements ComponentInterface, ComponentIn
     public static function register_navigation_hook() : void
     {
         //Controller::register_after_hook(Auth::class, '_after_main', AfterLoginMain::class, 'execute_hook');
-        if (class_exists(StaticContent::class)) {
-            Controller::register_after_hook(StaticContent::class, '_after_main', [new AfterStaticContentMain(), 'execute_hook']);
+        if (class_exists(FrontendRoutes::class)) {
+            Controller::register_after_hook(FrontendRoutes::class, '_after_main', [new AfterFrontendRoutesMain(), 'execute_hook']);
         }
     }
 
