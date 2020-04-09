@@ -13,7 +13,7 @@
         </div>
         <div style="clear:both"></div>
         <div>
-            <FileC v-for="(FileData, index) in Files" v-bind:FileData="FileData"/>
+            <FileC v-for="(FileData, index) in Files" v-bind:FileData="FileData" v-bind:key="FileData.name"/>
             <div v-if="!Files.length">
                 There are no files or directories.
             </div>
