@@ -6,6 +6,7 @@ namespace GuzabaPlatform\Assets\Models;
 
 use Azonmedia\Utilities\GeneralUtil;
 use Azonmedia\Utilities\StringUtil;
+use Guzaba2\Authorization\CurrentUser;
 use Guzaba2\Authorization\Exceptions\PermissionDeniedException;
 use Guzaba2\Base\Base;
 use Guzaba2\Base\Exceptions\InvalidArgumentException;
@@ -16,6 +17,7 @@ use Guzaba2\Orm\Exceptions\RecordNotFoundException;
 use Guzaba2\Orm\Store\Interfaces\StoreInterface;
 use GuzabaPlatform\Platform\Application\BaseActiveRecord;
 use Guzaba2\Translator\Translator as t;
+use GuzabaPlatform\Platform\Application\GuzabaPlatform;
 use GuzabaPlatform\Platform\Application\Interfaces\ModelInterface;
 use JBZoo\Utils\Str;
 
@@ -30,7 +32,8 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
 
     protected const CONFIG_DEFAULTS = [
         'services'          =>  [
-            'GuzabaPlatform',
+            //'GuzabaPlatform',
+            'CurrentUser',//needed for localizing the time
         ],
         'store_relative_base'       => '/public/assets',// this is relative to the application diretory -> ./app/public/assets
         'object_name_property'      => 'file_name',
@@ -40,6 +43,12 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
 
     use BaseTrait;
 
+    /**
+     * @throws RunTimeException
+     * @throws \Azonmedia\Exceptions\InvalidArgumentException
+     * @throws \Guzaba2\Coroutine\Exceptions\ContextDestroyedException
+     * @throws \ReflectionException
+     */
     public static function _initialize_class() : void
     {
         if (!isset(self::CONFIG_RUNTIME['store_relative_base'])) {
@@ -50,6 +59,13 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
         }
     }
 
+    /**
+     * @param string $absolute_path
+     * @throws RunTimeException
+     * @throws \Azonmedia\Exceptions\InvalidArgumentException
+     * @throws \Guzaba2\Coroutine\Exceptions\ContextDestroyedException
+     * @throws \ReflectionException
+     */
     public static function set_absolute_store_path(string $absolute_path) : void
     {
         throw new RunTimeException(sprintf(t::_('The %s() method is not to be used on class %s. Instead the store absolute path is automatically determined based on the store relative path set in %s::CONFIG_DEFAULTS[\'store_relative_base\'].'), __FUNCTION__, __CLASS__, __CLASS__));
@@ -59,6 +75,9 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
      * @override
      * @return string
      * @throws RunTimeException
+     * @throws \Azonmedia\Exceptions\InvalidArgumentException
+     * @throws \Guzaba2\Coroutine\Exceptions\ContextDestroyedException
+     * @throws \ReflectionException
      */
     public static function get_relative_store_path() : string
     {
@@ -72,6 +91,9 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
      * @override
      * @return string
      * @throws RunTimeException
+     * @throws \Azonmedia\Exceptions\InvalidArgumentException
+     * @throws \Guzaba2\Coroutine\Exceptions\ContextDestroyedException
+     * @throws \ReflectionException
      */
     public static function get_absolute_store_path() : string
     {
@@ -87,22 +109,34 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
 
     public function get_ctime_string() : string
     {
-        $GuzabaPlatform = self::get_service('GuzabaPlatform');
-        $date_time_format = $GuzabaPlatform->get_date_time_formats()['date_time_format'];
+        //$GuzabaPlatform = self::get_service('GuzabaPlatform');
+        //$date_time_format = $GuzabaPlatform->get_date_time_formats()['date_time_format'];
+        //$date_time_format = GuzabaPlatform::get_date_time_formats()['date_time_format'];
+        /** @var CurrentUser $CurrentUser */
+        $CurrentUser = self::get_service('CurrentUser');
+        $date_time_format = $CurrentUser->get()->get_date_time_format();
         return date($date_time_format, $this->get_ctime());
     }
 
     public function get_mtime_string() : string
     {
-        $GuzabaPlatform = self::get_service('GuzabaPlatform');
-        $date_time_format = $GuzabaPlatform->get_date_time_formats()['date_time_format'];
+        //$GuzabaPlatform = self::get_service('GuzabaPlatform');
+        //$date_time_format = $GuzabaPlatform->get_date_time_formats()['date_time_format'];
+        //$date_time_format = GuzabaPlatform::get_date_time_formats()['date_time_format'];
+        /** @var CurrentUser $CurrentUser */
+        $CurrentUser = self::get_service('CurrentUser');
+        $date_time_format = $CurrentUser->get()->get_date_time_format();
         return date($date_time_format, $this->get_mtime());
     }
 
     public function get_atime_string() : string
     {
-        $GuzabaPlatform = self::get_service('GuzabaPlatform');
-        $date_time_format = $GuzabaPlatform->get_date_time_formats()['date_time_format'];
+        //$GuzabaPlatform = self::get_service('GuzabaPlatform');
+        //$date_time_format = $GuzabaPlatform->get_date_time_formats()['date_time_format'];
+        //$date_time_format = GuzabaPlatform::get_date_time_formats()['date_time_format'];
+        /** @var CurrentUser $CurrentUser */
+        $CurrentUser = self::get_service('CurrentUser');
+        $date_time_format = $CurrentUser->get()->get_date_time_format();
         return date($date_time_format, $this->get_atime());
     }
 
@@ -123,6 +157,9 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
      * @param string $rel_path
      * @return array
      * @throws RunTimeException
+     * @throws \Azonmedia\Exceptions\InvalidArgumentException
+     * @throws \Guzaba2\Coroutine\Exceptions\ContextDestroyedException
+     * @throws \ReflectionException
      */
     public static function get_all_files_simple(string $rel_path = '') : array
     {
@@ -143,8 +180,11 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
      * @param string $rel_path
      * @return array
      * @throws RunTimeException
+     * @throws \Azonmedia\Exceptions\InvalidArgumentException
      * @throws \Azonmedia\Exceptions\PermissionDeniedException
      * @throws \Azonmedia\Exceptions\RecordNotFoundException
+     * @throws \Guzaba2\Coroutine\Exceptions\ContextDestroyedException
+     * @throws \ReflectionException
      */
     public static function get_all_files(string $rel_path = '') : array
     {
@@ -168,6 +208,12 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
      * @param bool $sort_desc
      * @param int|null $total_found_rows
      * @return iterable
+     * @throws RunTimeException
+     * @throws \Azonmedia\Exceptions\InvalidArgumentException
+     * @throws \Azonmedia\Exceptions\PermissionDeniedException
+     * @throws \Azonmedia\Exceptions\RecordNotFoundException
+     * @throws \Guzaba2\Coroutine\Exceptions\ContextDestroyedException
+     * @throws \ReflectionException
      */
     public static function get_data_by(array $index, int $offset = 0, int $limit = 0, bool $use_like = FALSE, ?string $sort_by = NULL, bool $sort_desc = FALSE, ?int &$total_found_rows = NULL) : iterable
     {
@@ -181,6 +227,9 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
      * @implements ModelInterface
      * @return string
      * @throws RunTimeException
+     * @throws \Azonmedia\Exceptions\InvalidArgumentException
+     * @throws \Guzaba2\Coroutine\Exceptions\ContextDestroyedException
+     * @throws \ReflectionException
      */
     public function get_object_name() : string
     {
@@ -193,6 +242,8 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
      * @return string
      * @throws RunTimeException
      * @throws \Azonmedia\Exceptions\InvalidArgumentException
+     * @throws \Guzaba2\Coroutine\Exceptions\ContextDestroyedException
+     * @throws \ReflectionException
      */
     public static function get_object_name_property(): string
     {
