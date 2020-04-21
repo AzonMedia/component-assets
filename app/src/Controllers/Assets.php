@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GuzabaPlatform\Assets\Controllers;
 
+use Azonmedia\Exceptions\InvalidArgumentException;
 use Guzaba2\Authorization\Exceptions\PermissionDeniedException;
 use Guzaba2\Base\Exceptions\RunTimeException;
 use Guzaba2\Http\Method;
@@ -83,7 +84,7 @@ class Assets extends BaseController
      * @param UploadedFileInterface|null $uploaded_file
      * @param string $dir
      * @return ResponseInterface
-     * @throws \Azonmedia\Exceptions\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function create_file(string $path = './', ?UploadedFileInterface $uploaded_file = NULL, string $new_directory_name = '') : ResponseInterface
     {
@@ -119,12 +120,12 @@ class Assets extends BaseController
         return self::get_structured_ok_response($struct);
     }
 
-    public function rename(string $from_path, string $to_path) : ResponseInterface
+    public function rename_file(string $from_path, string $to_path) : ResponseInterface
     {
 
     }
 
-    public function copy(string $from_path, string $to_path) : ResponseInterface
+    public function copy_file(string $from_path, string $to_path) : ResponseInterface
     {
 
     }
