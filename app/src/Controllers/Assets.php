@@ -91,7 +91,7 @@ class Assets extends BaseController
         if ($uploaded_file) {
             $File = File::upload_file($path, $uploaded_file);
             $struct = [
-                'message'       => sprintf(t::_('The file %1s %2s kb was uploaded sucessfully to %3s.'), $File->get_name(), $File->get_size() / 1024, $File->get_relative_path() ),
+                'message'       => sprintf(t::_('The file %1$s %2$s kb was uploaded sucessfully to %3$s.'), $File->get_name(), $File->get_size() / 1024, $File->get_relative_path() ),
                 'file_name'     => $File->get_name(),
                 'relative_path' => $File->get_relative_path(),
                 'file_size'     => $File->get_size(),
@@ -100,7 +100,7 @@ class Assets extends BaseController
         } elseif ($new_directory_name) {
             $File = File::create_dir($path, $new_directory_name);
             $struct = [
-                'message' => sprintf(t::_('New directory %1s created as %2s.'), $new_directory_name, $File->get_relative_path() ),
+                'message' => sprintf(t::_('New directory %1$s created as %2$s.'), $new_directory_name, $File->get_relative_path() ),
                 'file_name'     => $File->get_name(),
                 'relative_path' => $File->get_relative_path(),
                 'file_size'     => $File->get_size(),
@@ -116,7 +116,7 @@ class Assets extends BaseController
         $File = new File($path);
         $file_type = t::_($File->get_type());
         $File->delete();
-        $struct = ['message' => sprintf(t::_('The %1s %s2 was deleted.'), $file_type, $File->get_relative_path() )];
+        $struct = ['message' => sprintf(t::_('The %1$s %s2 was deleted.'), $file_type, $File->get_relative_path() )];
         return self::get_structured_ok_response($struct);
     }
 
@@ -138,7 +138,7 @@ class Assets extends BaseController
             'path'      => $File->get_relative_path(),
             'type'      => t::_($File->get_type()),
             'mime_type' => $File->is_file() ? $File->get_mime_type() : '',
-            'size'      => sprintf(t::_('%1s kb'), round($File->get_size() / 1024, 2) ),
+            'size'      => sprintf(t::_('%1$s kb'), round($File->get_size() / 1024, 2) ),
             'ctime'     => $File->get_ctime_string(),
             'mtime'     => $File->get_mtime_string(),
             'atime'     => $File->get_atime_string(),

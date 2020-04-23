@@ -248,7 +248,7 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
     public static function get_object_name_property(): string
     {
         if (!isset(static::CONFIG_RUNTIME['object_name_property'])) {
-            throw new RunTimeException(sprintf(t::_('The class %1s is missing the CONFIG_DEFAULTS[\'object_name_property\'] configuation option.'), static::class));
+            throw new RunTimeException(sprintf(t::_('The class %1$s is missing the CONFIG_DEFAULTS[\'object_name_property\'] configuation option.'), static::class));
         }
         return static::CONFIG_RUNTIME['object_name_property'];
     }
