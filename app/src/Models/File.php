@@ -32,7 +32,7 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
 
     protected const CONFIG_DEFAULTS = [
         'services'          =>  [
-            //'GuzabaPlatform',
+            'GuzabaPlatform',
             'CurrentUser',//needed for localizing the time
         ],
         'store_relative_base'       => '/public/assets',// this is relative to the application diretory -> ./app/public/assets
