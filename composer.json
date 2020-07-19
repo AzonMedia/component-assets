@@ -4,7 +4,7 @@
     "description": "GuzabaPlatform digital assets management component",
     "keywords": ["digital assets"],
     "homepage": "https://github.com/AzonMedia/component-assets",
-    "license": "BSD-3-Clause",
+    "license": "MIT",
     "minimum-stability": "dev",
     "authors": [
         {
