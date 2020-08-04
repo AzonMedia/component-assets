@@ -14,6 +14,7 @@ use GuzabaPlatform\Components\Base\Interfaces\ComponentInterface;
 use GuzabaPlatform\Navigation\Controllers\FrontendRoutes;
 use GuzabaPlatform\Platform\Application\Middlewares;
 use GuzabaPlatform\Platform\Application\UrlRewritingRules;
+use GuzabaPlatform\Platform\Application\VueComponentHooks;
 
 /**
  * Class Component
@@ -26,6 +27,7 @@ class Component extends BaseComponent implements ComponentInterface, ComponentIn
         'services'      => [
             'Events',
             'FrontendRouter',
+            'FrontendHooks',
         ],
     ];
 
@@ -49,8 +51,9 @@ class Component extends BaseComponent implements ComponentInterface, ComponentIn
         //self::update_rewriting_rules();
         self::register_routes();
         self::register_navigation_hook();
+        self::register_frontend_hooks();
         //return ['register_routes','update_rewriting_rules'];
-        return ['register_routes','register_navigation_hook'];
+        return ['register_routes','register_navigation_hook','register_frontend_hooks'];
     }
 
 //this will be needed only for the private assets
@@ -103,5 +106,16 @@ class Component extends BaseComponent implements ComponentInterface, ComponentIn
         //$FrontendRouter->{'/admin'}->add('assets/:path', '@GuzabaPlatform.Assets/AssetsAdmin.vue', $additional);
         //use * as the path itself may contain /
         $FrontendRouter->{'/admin'}->add('assets/*', '@GuzabaPlatform.Assets/AssetsAdmin.vue', $additional);
+    }
+
+    public static function register_frontend_hooks(): void
+    {
+        /** @var VueComponentHooks $FrontendHooks */
+        $FrontendHooks = self::get_service('FrontendHooks');
+        $FrontendHooks->add(
+            '@GuzabaPlatform.Navigation/components/AddLink.vue',
+            'AfterTabs',
+            '@GuzabaPlatform.Assets/components/hooks/guzaba-platform/navigation/AddLinkFile.vue'
+        );
     }
 }

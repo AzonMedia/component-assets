@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace GuzabaPlatform\Assets\Hooks;
 
 use Guzaba2\Base\Base;
-use Guzaba2\Http\Body\Structured;
+use Azonmedia\Http\Body\Structured;
 use GuzabaPlatform\Assets\Models\File;
 use Psr\Http\Message\ResponseInterface;
 
