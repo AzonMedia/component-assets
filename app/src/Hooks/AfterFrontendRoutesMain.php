@@ -18,7 +18,7 @@ class AfterFrontendRoutesMain extends Base
         //TODO - add file size and mtime in the dropdown - use get_all_files()
         $assets = File::get_all_files_simple();
         //the paths need to be absolute
-        $assets = array_map(fn($path) => '/'.$path, $assets);
+        $assets = array_map(fn($path) => File::get_document_root_assets_dir().'/'.$path, $assets);
 
         //$struct['content']['assets'] = $assets;//this will append the assets... but we need to prepend it
 //        $old_content = $struct['content'];

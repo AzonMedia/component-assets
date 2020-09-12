@@ -8,8 +8,8 @@
             <!-- <ButtonC v-bind:ButtonData="Buttons.CopyButton"></ButtonC> -->
             <!-- <ButtonC v-bind:ButtonData="Buttons.RenameButton"></ButtonC> -->
             <ButtonC v-bind:ButtonData="Buttons.DeleteButton" v-b-modal.delete-file-modal></ButtonC>
-            <ButtonC v-bind:ButtonData="Buttons.PropertiesButton" v-b-modal.properties-modal></ButtonC>
-            <!-- <ButtonC v-bind:ButtonData="Buttons.AddToNavigationButton"></ButtonC> -->
+            <!-- <ButtonC v-bind:ButtonData="Buttons.PropertiesButton" v-b-modal.properties-modal></ButtonC> -->
+
         </div>
         <div style="clear:both"></div>
         <div>
@@ -88,6 +88,7 @@
                 //base_dir_path : '/',
                 current_dir_display_path : '',
                 base_dir_display_path : '[/public/assets] /',
+                document_root_assets_dir : '/assets',//relative to the document root
                 //highlighted_file: '',
 
                 Files : {},
@@ -127,11 +128,6 @@
                         is_active: true,
                         handler: this.blank_button_handler,
                     },
-                    AddToNavigationButton: {
-                        label: 'Add to Navigation',
-                        is_active: true,
-                        handler: this.add_to_navigation_handler,
-                    },
                 },
             }
         },
@@ -152,7 +148,6 @@
                 this.CurrentDirPath.name = path;
                 //this.current_dir_display_path = this.base_dir_display_path + this.current_dir_path;
                 this.current_dir_display_path = this.base_dir_display_path + this.CurrentDirPath.name;
-                let self = this;
                 this.$http.get('/admin/assets/' + path )
                     .then(resp => {
                         if (typeof resp.data.files !== "undefined") {
@@ -164,38 +159,49 @@
                             for (const el in Files) {
                                 Files[el].is_highlighted = 0;
                             }
-                            self.Files = Files;
+                            this.Files = Files;
                         } else {
-                            //console.log('No Files data received');
                             //self.show_toast('No Files data was received.');
                             this.error_message = 'No Files data was received.';
                         }
 
                     })
                     .catch(err => {
-                        //console.log(err);
                         //self.show_toast(err.response.data.message);
                         this.error_message = err.response.data.message;
-                        self.Files = [];
+                        this.Files = [];
                         //self.requestError = err;
                         //self.items_permissions = [];
-                    }).finally(function(){
+                    }).finally(() => {
                         //self.$bvModal.show('class-permissions');
                     });
             },
+            /**
+             * Returns the path from the FileData by also taking into account this.CurrentDirPath
+             * @param object FileData
+             * @return string
+             */
+            get_path_from_file_data(FileData) {
+                //let path = this.current_dir_path + FileData.name;
+                let path = this.CurrentDirPath.name
+                if (path) {
+                    path += '/'
+                }
+                path += FileData.name
+                path = path.split('./').join('')
+                return path
+            },
             //opens the file
+            /**
+             * Browse inside the dir or open the file (file open is not implemented)
+             * @param object FileData
+             */
             file_dblclick_handler(FileData) {
                 if (FileData.is_dir) {
-                    //let path = this.current_dir_path + FileData.name;
-                    let path = this.CurrentDirPath.name
-                    if (path) {
-                        path += '/';
-                    }
-                     path += FileData.name;
-                    path = path.split('./').join('');
+                    let path = this.get_path_from_file_data(FileData)
                     this.$router.push('/admin/assets/' + path)
                 } else {
-
+                    //TODO - open the file
                 }
             },
             //highlights the file
@@ -252,7 +258,6 @@
                         this.Files[el].is_highlighted = 1;
                     }
                 }
-                console.log(this.Files);
             },
             unhighlight_all_files() {
                 for (const el in this.Files) {
