@@ -53,7 +53,7 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
     public static function _initialize_class() : void
     {
         if (!isset(self::CONFIG_RUNTIME['store_relative_base'])) {
-            throw new RunTimeException();
+            throw new RunTimeException(sprintf(t::_('The store_relative_base configuration option is not defined.')));
         }
         if (self::CONFIG_RUNTIME['store_relative_base'][-1] === '/') {
             throw new RunTimeException(sprintf(t::_('The store_relative_base configuration option has a trailing /.')));
