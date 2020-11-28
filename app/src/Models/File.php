@@ -36,7 +36,7 @@ class File extends \Azonmedia\Filesystem\File implements BaseInterface, ModelInt
             'CurrentUser',//needed for localizing the time
         ],
         'store_relative_base'       => '/public/assets',// this is relative to the application diretory -> ./app/public/assets
-        'document_root_assets_dir'  => '/assets',
+        'document_root_assets_dir'  => '/assets',// this is relative to the /public dir
         'object_name_property'      => 'file_name',
     ];
 
