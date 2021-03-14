@@ -44,6 +44,7 @@
 </template>
 
 <script>
+    import config from '@/config.js'
     export default {
         name: "Delete",
         props: {
@@ -65,8 +66,9 @@
                         if (self.is_image(self.FileData.mime_type)) {
                             console.log(self.FileData.path);
                             //todo - move this to ConfigMixin ov env file
-                            self.image_preview = 'http://localhost:8081/assets/' + self.FileData.path
-                            console.log(self.image_preview);
+                            //self.image_preview = 'http://localhost:8081/assets/' + self.FileData.path
+                            self.image_preview = config[config.deployment].assets_base + 'assets/' + self.FileData.path
+                            //console.log(self.image_preview);
                         }
                     }).catch(function(err) {
                         self.$parent.show_toast(err.response.data.message);
